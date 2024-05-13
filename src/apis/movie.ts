@@ -1,4 +1,5 @@
-import { Banner } from "../types/movie.type";
+import { PAGE_SIZE } from "../constants";
+import { Banner, DataMovieListPagination } from "../types/movie.type";
 import { ResponseApi } from "../types/util";
 import api from "./apiUtil";
 
@@ -22,7 +23,13 @@ export const addMovieApi = async (payload: FormData) => {
   }
 };
 
-// export const getListMovieApi = async () => {
-//   try {
-//   } catch (error) {}
-// };
+export const getListMovieApi = async (currentPage: number) => {
+  try {
+    const response = await api.get<ResponseApi<DataMovieListPagination>>(
+      `/QuanLyPhim/LayDanhSachPhimPhanTrang?maNhom=GP01&soTrang=${currentPage}&soPhanTuTrenTrang=${PAGE_SIZE}`
+    );
+    return response.data.content;
+  } catch (error: any) {
+    throw Error(error);
+  }
+};
