@@ -13,6 +13,15 @@ export const getBannerMovieApi = async () => {
   }
 };
 
+export const addMovieApi = async (payload: FormData) => {
+  try {
+    const response = await api.post("/QuanLyPhim/ThemPhimUploadHinh", payload);
+    return response.data.content;
+  } catch (error) {
+    throw "Lỗi rồi";
+  }
+};
+
 // export const getListMovieApi = async () => {
 //   try {
 //   } catch (error) {}
