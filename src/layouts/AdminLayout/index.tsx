@@ -8,11 +8,19 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { Avatar, Button, Dropdown, Layout, Menu, theme } from "antd";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import { useAppSelector } from "../../redux/hooks";
 
 const { Header, Sider, Content } = Layout;
 
 export default function AdminLayout() {
+  const { currentUser } = useAppSelector((state) => state.user);
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -31,6 +39,10 @@ export default function AdminLayout() {
       label: <span>Đăng xuất</span>,
     },
   ];
+
+  if (!currentUser) return <Navigate to={"/auth/login"} />;
+  if (currentUser && currentUser.maLoaiNguoiDung === "KhachHang")
+    return <Navigate to={"/"} />;
 
   return (
     <Layout className="h-screen">

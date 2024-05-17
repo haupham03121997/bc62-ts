@@ -1,4 +1,4 @@
-import { Outlet, useRoutes } from "react-router-dom";
+import { Navigate, Outlet, useRoutes } from "react-router-dom";
 import HomePage from "../modules/User/HomePage";
 import UserLayout from "../layouts/UserLayout";
 import MovieDetails from "../modules/User/MovieDetails";
@@ -11,17 +11,28 @@ import UserManagement from "../modules/Admin/UserManagement";
 import MovieManagement from "../modules/Admin/MovieManagement";
 import CinemaManagement from "../modules/Admin/CinemaManagement";
 import AccountSettings from "../modules/Admin/AccountSettings";
+import { useAppSelector } from "../redux/hooks";
 
 const ProtectedRoute = () => {
-  return <Outlet />;
+  const { currentUser } = useAppSelector((state) => state.user);
+  return currentUser ? <Outlet /> : <Navigate to={"/auth/login"} />;
 };
 
 const RejectedRoute = () => {
-  return <Outlet />;
+  const { currentUser } = useAppSelector((state) => state.user);
+  // Nếu chưa đăng nhập (currentUser là nul) thì cho vào trang Login & Register. Ngược lại thì redirect sang home hoặc admin dựa vào maLoaiNguoiDung
+  return currentUser === null ? <Outlet /> : <Navigate to={"/"} />;
 };
 
 const ProtectedAdminRoute = () => {
-  return <Outlet />;
+  const { currentUser } = useAppSelector((state) => state.user);
+
+  // Khi có thông tin user, và user đó là QuanTri thì cho đi tiếp. Ngược lại thì đá ra trang login
+  return currentUser && currentUser?.maLoaiNguoiDung === "QuanTri" ? (
+    <Outlet />
+  ) : (
+    <Navigate to={"/auth/login"} />
+  );
 };
 
 const useRouteElement = () => {
@@ -42,15 +53,21 @@ const useRouteElement = () => {
     },
     {
       path: "/auth",
-      element: <AuthLayout />,
+      element: <RejectedRoute />,
       children: [
         {
-          path: "/auth/login",
-          element: <LoginPage />,
-        },
-        {
-          path: "/auth/register",
-          element: <RegisterPage />,
+          path: "",
+          element: <AuthLayout />,
+          children: [
+            {
+              path: "/auth/login",
+              element: <LoginPage />,
+            },
+            {
+              path: "/auth/register",
+              element: <RegisterPage />,
+            },
+          ],
         },
       ],
     },
